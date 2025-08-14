@@ -1,0 +1,257 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Percepta Pro - Streamlit Dashboard Development Rules
+
+```yaml
+alwaysApply: true
+description: "Streamlit-specific development standards for Percepta Pro reputation dashboard"
+filePatterns:
+  - "**/reputation_dashboard.py"
+  - "**/debug_*.py"
+  - "**/simple*.py" 
+  - "app/**/*.py"
+  - "src/dashboard/**/*.py"
+```
+
+## Streamlit Best Practices
+
+### Caching Strategy
+- **ALWAYS** use `@st.cache_data` for data loading functions
+- Use `@st.cache_resource` for ML models and expensive objects
+- Set appropriate TTL (time-to-live) for dynamic data
+- Use `show_spinner=True` for user feedback on long operations
+
+```python
+@st.cache_data(ttl=300, show_spinner=True)  # 5-minute cache
+def load_reputation_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Load videos and comments data with caching."""
+    videos_df = pd.read_csv("backend/data/videos/youtube_videos_final.csv")
+    comments_df = pd.read_csv("backend/data/comments/youtube_comments_final.csv")
+    return videos_df, comments_df
+
+@st.cache_resource
+def load_ml_models() -> Dict[str, Any]:
+    """Load ML models with resource caching."""
+    return {
+        'reputation_forecasting': joblib.load('models/reputation_forecasting.pkl'),
+        'sentiment_analysis': joblib.load('models/sentiment_analysis.pkl')
+    }
+```
+
+### Session State Management
+- Initialize session state variables in a dedicated function
+- Use descriptive names for session state keys
+- Provide default values for all session state variables
+- Group related state variables logically
+
+```python
+def initialize_session_state() -> None:
+    """Initialize all session state variables with defaults."""
+    defaults = {
+        'current_page': 'Overview',
+        'dashboard_mode': 'Advanced',
+        'selected_time_range': 'Last 30 Days',
+        'filter_sentiment': 'All',
+        'theme_mode': 'crimzon-dark'
+    }
+    
+    for key, default_value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = default_value
+```
+
+### UI Component Standards
+- Use consistent styling with theme system
+- Implement responsive design with columns
+- Add loading states for async operations
+- Provide user feedback for all actions
+
+```python
+def create_metric_card(title: str, value: Union[int, float, str], 
+                      change: Optional[str] = None, 
+                      icon: str = "📊") -> None:
+    """Create standardized metric card with consistent styling."""
+    with st.container():
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-icon">{icon}</div>
+            <div class="metric-value">{value}</div>
+            <div class="metric-label">{title}</div>
+            {f'<div class="metric-change">{change}</div>' if change else ''}
+        </div>
+        """, unsafe_allow_html=True)
+```
+
+### Input Sanitization & Validation
+- Validate all user inputs before processing
+- Use st.form for grouped inputs to prevent excessive reruns
+- Sanitize text inputs to prevent XSS
+- Provide clear error messages for invalid inputs
+
+```python
+def sanitize_text_input(text: str) -> str:
+    """Sanitize text input to prevent XSS and injection attacks."""
+    import html
+    import re
+    
+    # HTML escape
+    text = html.escape(text)
+    
+    # Remove potentially dangerous patterns
+    dangerous_patterns = [
+        r'<script.*?</script>',
+        r'javascript:',
+        r'on\w+\s*=',
+    ]
+    
+    for pattern in dangerous_patterns:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+    
+    return text.strip()
+
+def validate_date_range(start_date: datetime, end_date: datetime) -> bool:
+    """Validate date range inputs."""
+    if start_date >= end_date:
+        st.error("Start date must be before end date")
+        return False
+    
+    if (end_date - start_date).days > 365:
+        st.warning("Date range is longer than 1 year. Performance may be affected.")
+    
+    return True
+```
+
+### Performance Optimization
+- Use st.columns() for responsive layouts
+- Minimize the use of st.rerun() - prefer session state
+- Use st.empty() containers for dynamic content updates
+- Optimize chart rendering with appropriate sizing
+
+```python
+# Efficient layout with columns
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    create_metric_card("Total Videos", len(videos_df), icon="📹")
+
+with col2:
+    create_metric_card("Total Comments", len(comments_df), icon="💬")
+
+# Dynamic content updates
+chart_placeholder = st.empty()
+
+# Update chart without full rerun
+with chart_placeholder.container():
+    fig = create_sentiment_chart(filtered_data)
+    st.plotly_chart(fig, use_container_width=True)
+```
+
+### Error Handling in UI
+- Wrap data operations in try-except blocks
+- Show user-friendly error messages
+- Provide fallback content when data is unavailable
+- Use st.error(), st.warning(), st.info() appropriately
+
+```python
+def safe_load_data() -> Optional[pd.DataFrame]:
+    """Safely load data with user feedback."""
+    try:
+        with st.spinner("Loading reputation data..."):
+            data = load_reputation_data()
+            if data.empty:
+                st.warning("No data available for the selected period.")
+                return None
+            return data
+    except FileNotFoundError:
+        st.error("Data files not found. Please check the data directory.")
+        return None
+    except Exception as e:
+        st.error(f"Error loading data: {str(e)}")
+        logging.error(f"Data loading error: {e}")
+        return None
+```
+
+### Navigation & Routing
+- Use session state for page navigation
+- Implement clean URL-like routing
+- Provide breadcrumbs for complex navigation
+- Ensure consistent navigation patterns
+
+```python
+def handle_navigation() -> str:
+    """Handle navigation with consistent patterns."""
+    # Get available pages based on mode
+    pages = get_pages_for_mode(st.session_state.dashboard_mode)
+    
+    # Sidebar navigation
+    selected_page = st.sidebar.radio(
+        "Navigation",
+        options=pages,
+        index=pages.index(st.session_state.current_page) if st.session_state.current_page in pages else 0,
+        key="navigation_radio"
+    )
+    
+    # Update session state
+    if selected_page != st.session_state.current_page:
+        st.session_state.current_page = selected_page
+        st.rerun()
+    
+    return selected_page
+```
+
+### Charts & Visualizations
+- Use consistent color schemes from theme system
+- Add proper titles, labels, and legends
+- Make charts responsive with use_container_width=True
+- Optimize for both light and dark themes
+
+```python
+def create_reputation_timeline(data: pd.DataFrame) -> go.Figure:
+    """Create reputation timeline chart with proper styling."""
+    theme = get_current_theme()
+    
+    fig = px.line(
+        data, 
+        x='Date', 
+        y='Reputation_Score',
+        title="Reputation Score Over Time",
+        color_discrete_sequence=[theme['colors']['primary']]
+    )
+    
+    # Apply consistent styling
+    fig.update_layout(
+        template="plotly_dark" if theme['mode'] == 'dark' else "plotly_white",
+        height=400,
+        title_font_size=16,
+        title_font_color=theme['colors']['text_primary'],
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+    
+    return fig
+```
+
+### Responsive Design
+- Use st.columns() with responsive ratios
+- Test on different screen sizes
+- Provide mobile-friendly alternatives
+- Use container-based layouts
+
+```python
+# Responsive layout for different screen sizes
+if st.session_state.get('mobile_view', False):
+    # Mobile layout - single column
+    create_mobile_dashboard()
+else:
+    # Desktop layout - multi-column
+    col1, col2, col3 = st.columns([2, 3, 2])
+    with col1:
+        create_sidebar_content()
+    with col2:
+        create_main_content()
+    with col3:
+        create_analytics_panel()
+```

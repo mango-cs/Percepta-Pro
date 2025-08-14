@@ -1,0 +1,134 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Percepta Pro - General Python Development Rules
+
+```yaml
+alwaysApply: true
+description: "Core Python development standards for Percepta Pro reputation dashboard"
+filePatterns:
+  - "**/*.py"
+  - "*.py"
+```
+
+## Core Python Standards
+
+### Type Hints & Documentation
+- **ALWAYS** use type hints for function parameters, return values, and class attributes
+- Use `from typing import List, Dict, Optional, Union, Callable, Any` for complex types
+- Add comprehensive docstrings using Google style for all functions and classes
+- Include parameter descriptions, return value descriptions, and usage examples
+
+```python
+def calculate_reputation_score(comments_df: pd.DataFrame, 
+                             sentiment_weights: Optional[Dict[str, float]] = None) -> float:
+    """Calculate reputation score from comments data.
+    
+    Args:
+        comments_df: DataFrame containing comment sentiment data
+        sentiment_weights: Optional weights for different sentiment categories
+        
+    Returns:
+        Reputation score as percentage (0-100)
+        
+    Example:
+        >>> score = calculate_reputation_score(comments_df)
+        >>> print(f"Reputation: {score}%")
+    """
+```
+
+### Error Handling & Logging
+- Use try-except blocks for all external data operations (file I/O, API calls)
+- Log errors with context using the logging module
+- Provide graceful fallbacks for missing data or failed operations
+- Never use bare `except:` clauses
+
+```python
+import logging
+logger = logging.getLogger(__name__)
+
+try:
+    videos_df = pd.read_csv(video_path)
+except FileNotFoundError:
+    logger.error(f"Video data file not found: {video_path}")
+    videos_df = pd.DataFrame()  # Graceful fallback
+except pd.errors.EmptyDataError:
+    logger.warning(f"Empty video data file: {video_path}")
+    videos_df = pd.DataFrame()
+```
+
+### Code Organization
+- **MODULAR DESIGN**: Break large functions into smaller, focused functions
+- **SINGLE RESPONSIBILITY**: Each function should do one thing well
+- Use constants for magic numbers and repeated strings
+- Group related functions into classes or modules
+
+```python
+# Constants
+REPUTATION_THRESHOLDS = {
+    'EXCELLENT': 70,
+    'MODERATE': 50,
+    'CRITICAL': 30
+}
+
+DEFAULT_SENTIMENT_WEIGHTS = {
+    'Positive': 1.0,
+    'Neutral': 0.5,
+    'Negative': -1.0
+}
+```
+
+### Performance Optimization
+- Use list comprehensions over loops when appropriate
+- Prefer `pandas` vectorized operations over iterrows()
+- Use `@functools.lru_cache` for expensive pure functions
+- Consider memory usage with large datasets
+
+### Data Validation
+- Validate input data types and shapes before processing
+- Check for required columns in DataFrames
+- Handle missing values explicitly
+- Sanitize user inputs for security
+
+```python
+def validate_comments_dataframe(df: pd.DataFrame) -> bool:
+    """Validate comments DataFrame has required structure."""
+    required_columns = ['Comment', 'Sentiment', 'VideoID']
+    if not all(col in df.columns for col in required_columns):
+        logger.error(f"Missing required columns: {set(required_columns) - set(df.columns)}")
+        return False
+    return True
+```
+
+### Import Organization
+```python
+# Standard library imports
+import logging
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Union, Tuple
+
+# Third-party imports
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import streamlit as st
+
+# Local application imports
+from src.core.reputation_engine import ReputationEngine
+from src.utils.data_loader import load_reputation_data
+from src.themes.theme_provider import get_current_theme
+```
+
+### Memory Management
+- Use context managers for file operations
+- Clear large DataFrames when no longer needed
+- Use generators for processing large datasets
+- Monitor memory usage with `@st.cache_data` decorators
+
+### Security Practices
+- Never expose API keys or credentials in code
+- Sanitize all user inputs
+- Use environment variables for configuration
+- Validate file paths to prevent directory traversal

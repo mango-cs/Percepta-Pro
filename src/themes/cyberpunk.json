@@ -1,0 +1,51 @@
+{
+    "name": "Cyberpunk",
+    "description": "Futuristic neon theme with cyan, purple, and hot pink for the digital age",
+    "type": "dark",
+    "author": "Percepta Team",
+    "version": "1.0.0",
+    "colors": {
+        "primary": "#00FFFF",
+        "secondary": "#FF00FF",
+        "accent": "#00FF41",
+        "warning": "#FFD700",
+        "error": "#FF073A",
+        "bg_main": "#0A0A0A",
+        "bg_card": "#1A1A2E",
+        "bg_interactive": "#16213E",
+        "bg_hover": "#0F3460",
+        "text_primary": "#FFFFFF",
+        "text_secondary": "#E94560",
+        "text_muted": "#9CA3AF",
+        "text_inverse": "#0A0A0A",
+        "border_color": "#00FFFF",
+        "border_hover": "#FF00FF",
+        "border_focus": "#00FF41"
+    },
+    "spacing": {
+        "xs": "4px",
+        "sm": "8px",
+        "md": "12px",
+        "lg": "16px",
+        "xl": "20px",
+        "xxl": "24px",
+        "xxxl": "32px"
+    },
+    "radius": {
+        "sm": "2px",
+        "md": "4px",
+        "lg": "8px",
+        "xl": "12px"
+    },
+    "shadows": {
+        "card": "0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(255, 0, 255, 0.1)",
+        "hover": "0 0 30px rgba(0, 255, 255, 0.5), 0 0 60px rgba(255, 0, 255, 0.2)",
+        "button": "0 0 15px rgba(0, 255, 65, 0.4)",
+        "focus": "0 0 0 2px rgba(0, 255, 255, 0.8)"
+    },
+    "gradients": {
+        "primary": "linear-gradient(135deg, #00FFFF 0%, #FF00FF 100%)",
+        "secondary": "linear-gradient(135deg, #FF00FF 0%, #E94560 100%)",
+        "accent": "linear-gradient(135deg, #00FF41 0%, #00FFFF 100%)"
+    }
+} 

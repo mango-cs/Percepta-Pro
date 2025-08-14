@@ -1,139 +1,129 @@
-# Percepta Pro - Enterprise Reputation Analytics Platform
+# Percepta Pro v2.0.2 🎯
+## Advanced Reputation Intelligence Platform
 
-**C-suite-ready analytics portal for YouTube data analysis**
+![Percepta Pro](assets/images/percepta_logo.png)
 
-## 🚀 Project Status: **PRODUCTION READY**
+Percepta Pro is a comprehensive reputation monitoring and intelligence platform built with Streamlit and Python. It provides real-time sentiment analysis, predictive analytics, and executive-grade reporting for reputation management.
 
-- ✅ **Frontend**: NIXPACKS deployment with React/Next.js 14
-- ✅ **Backend**: FastAPI with Python startup script
-- ✅ **Deployment**: Railway cloud platform
-- ✅ **Authentication**: NextAuth.js with JWT
-- ✅ **Analytics**: Real-time sentiment analysis & metrics
+## 🌟 Key Features
+
+### **🔍 Intelligent Monitoring**
+- **Real-time Tracking**: Monitor YouTube videos and comments continuously
+- **Bilingual Language Support**: **NEW** - Toggle between English (translated) and Telugu (original) comments
+- **Advanced Analytics**: 200+ videos and 1,500+ comments processed with AI enhancement
+
+### **🧠 AI-Powered Intelligence**
+- **Sentiment Analysis**: Advanced bilingual sentiment analysis (Telugu + English)
+- **Predictive Analytics**: ML-powered reputation forecasting and trend analysis
+- **Crisis Detection**: Real-time reputation threat monitoring with 98 critical alerts managed
+- **Comment Language Toggle**: **NEW** - Switch between original mixed-language comments and English translations
+
+### **📊 Executive Dashboard**
+- **Professional Interface**: Crimzon design system with executive-grade polish
+- **Dual Mode Support**: Advanced (9 pages) and Basic (5 pages) interface modes
+- **Real-time Metrics**: Live reputation scoring and sentiment tracking
+- **Strategic Reports**: Automated intelligence briefings and executive summaries
+
+## 🚀 Quick Start
+
+### **Launch Application**
+```bash
+# Clone the repository
+git clone [repository-url]
+cd percepta
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch Percepta Pro
+./start_percepta.bat
+```
+
+### **Access Dashboard**
+- **Main Application**: http://localhost:8501
+- **Debug Console**: Available via debug_navigation_app.py
+
+## 🎛️ Interface Modes
+
+| Mode | Pages | Target Audience | Key Features |
+|------|-------|----------------|--------------|
+| **Advanced** | 9 pages | C-Suite Executives | Complete feature set with predictive analytics |
+| **Basic** | 5 pages | General Users | Streamlined monitoring interface |
+
+## 🌐 Language Support
+
+### **NEW: Comment Language Toggle**
+- **English Mode** (Default): View translated English comments
+- **Telugu Mode**: View original comments (Telugu + Telugu-written-in-English)
+- **Toggle Location**: Sidebar, below "Dashboard Mode"
+- **Real-time Switching**: Instantly changes across all pages
 
 ## 📁 Project Structure
 
 ```
-Percepta/
-├── backend/                 # FastAPI Backend
-│   ├── src/                 # Source code
-│   │   ├── app.py          # Main FastAPI application
-│   │   ├── auth/           # Authentication modules
-│   │   ├── models/         # Data models
-│   │   ├── services/       # Business logic
-│   │   └── utils/          # Utilities
-│   ├── data/               # CSV data files
-│   ├── start.py            # Railway startup script
-│   ├── requirements.txt    # Python dependencies
-│   └── railway.json        # Railway deployment config
-│
-├── frontend/               # Next.js Frontend
-│   ├── src/                # Source code
-│   │   ├── app/            # App router
-│   │   ├── components/     # React components
-│   │   ├── hooks/          # Custom hooks
-│   │   └── lib/            # Utilities
-│   ├── public/             # Static assets
-│   ├── package.json        # Dependencies
-│   ├── nixpacks.toml       # NIXPACKS build config
-│   └── railway.json        # Railway deployment config
-│
-└── README.md               # Project documentation
+percepta/
+├── reputation_dashboard.py   # Main production dashboard (237KB)
+├── start_percepta.bat       # Application launcher
+├── src/                     # Source code modules
+│   ├── dashboard/          # Dashboard components
+│   ├── core/              # Core business logic  
+│   ├── analytics/         # Analytics engines
+│   ├── themes/            # Theme system
+│   ├── utils/             # Utilities
+│   └── data_processing/   # Data processing logic
+├── backend/data/           # Data storage
+│   ├── videos/            # Video datasets
+│   └── comments/          # Comment datasets (with bilingual support)
+├── docs/                   # Documentation
+├── scripts/               # Processing scripts
+├── tests/                 # Test files
+└── assets/                # Static assets
 ```
 
-## 🎯 Key Features
+## 🔧 Technical Specifications
 
-### **Analytics Dashboard**
-- **Overview Metrics**: Videos, comments, sentiment percentages
-- **Timeline Data**: Daily sentiment trends and comment volume
-- **Video Analytics**: Performance metrics with sentiment analysis
-- **Word Clouds**: Positive/negative sentiment visualization
-- **Search & Export**: Full-text search with CSV/JSON export
+- **Framework**: Streamlit + Python
+- **Data Processing**: Pandas, NumPy
+- **Visualization**: Plotly, Matplotlib
+- **AI/ML**: Custom sentiment analysis models
+- **Language Support**: Telugu/English bilingual processing
+- **Storage**: CSV-based with real-time analytics
+- **Deployment**: Local hosting with production-ready interface
 
-### **Authentication & Security**
-- **NextAuth.js**: GitHub OAuth + credentials authentication
-- **JWT Tokens**: Secure API access with role-based permissions
-- **User Roles**: Admin, PR Manager, Analyst, Viewer
-- **Route Protection**: Middleware-based access control
+## 📈 Performance Metrics
 
-### **Technical Stack**
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Zustand
-- **Backend**: FastAPI, Pandas, Pydantic, Uvicorn
-- **Deployment**: Railway (NIXPACKS + Python)
-- **Data**: CSV-based with real-time processing
+- **Processing Capacity**: 200+ videos, 1,500+ comments
+- **Language Coverage**: Bilingual (Telugu/English) with translation support
+- **Analytics Models**: 4 operational ML models
+- **Crisis Alerts**: 666 threats identified, 98 critical alerts managed
+- **Real-time Updates**: Live sentiment tracking and reputation scoring
 
-## 🚀 Deployment
+## 🎯 Current Status
 
-### **Railway Configuration**
-Both services are deployed on Railway with optimized configurations:
+**Version**: 2.0.2 (Language Toggle Update)  
+**Status**: ✅ **Production Ready**  
+**Last Updated**: December 2024  
+**Key Update**: Added bilingual comment language toggle functionality
 
-**Frontend (NIXPACKS)**:
-```toml
-[phases.build]
-cmd = "npm install --legacy-peer-deps && npm run build"
+## 🚀 Recent Updates
 
-[phases.start]
-cmd = "npm start"
-```
+### **v2.0.2 - Language Toggle Feature**
+- ✅ Added bilingual comment language toggle
+- ✅ English/Telugu mode switching across all pages
+- ✅ Enhanced data loading with language preference support
+- ✅ Improved search functionality for selected language
+- ✅ Real-time language switching without page reload
 
-**Backend (Python)**:
-```python
-# start.py - Custom startup script
-os.chdir('src')  # Fix import paths
-uvicorn.run("app:app", host="0.0.0.0", port=PORT)
-```
+### **v2.0.1 - UI Refinements**
+- ✅ Executive-grade interface polish
+- ✅ Seamless navigation improvements
+- ✅ Enhanced visual hierarchy
+- ✅ Professional color scheme optimization
 
-### **Health Checks**
-- **Frontend**: `/api/health` - Service status
-- **Backend**: `/health` - Service + data loader status
+## 📞 Support
 
-## 🔧 Development
-
-### **Frontend Setup**
-```bash
-cd frontend
-npm install --legacy-peer-deps
-npm run dev
-```
-
-### **Backend Setup**
-```bash
-cd backend
-pip install -r requirements.txt
-python start.py
-```
-
-## 📊 Data Processing
-
-The system processes YouTube analytics data:
-- **Videos**: `Youtube-Full-List-FInal.csv`
-- **Comments**: `all_comments_with_replies.csv`
-
-Automatic sentiment analysis and metrics calculation on startup.
-
-## 🎯 API Endpoints
-
-### **Authentication**
-- `POST /auth/login` - User login
-- `POST /auth/register` - User registration
-- `GET /auth/me` - Current user profile
-
-### **Analytics**
-- `GET /metrics/overview` - Dashboard overview
-- `GET /metrics/timeline` - Sentiment timeline
-- `GET /metrics/videos` - Video analytics
-- `GET /comments` - Video comments
-- `GET /wordcloud` - Word cloud data
-- `GET /export` - Data export
-
-## 🏢 Enterprise Features
-
-**Built for C-suite decision making**:
-- Real-time reputation monitoring
-- Risk assessment metrics
-- Viral threat detection
-- Actionable intelligence reporting
-- Audit logging & compliance
+For technical support or feature requests, please refer to the documentation in the `docs/` directory or check the project's issue tracker.
 
 ---
 
-**Percepta Pro** - Transforming YouTube analytics into executive-ready insights. 
+**Built with ❤️ for Advanced Reputation Intelligence** 

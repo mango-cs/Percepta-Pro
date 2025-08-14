@@ -1,0 +1,51 @@
+{
+    "name": "Red Crimson",
+    "description": "Aggressive dark theme with deep crimson red and blood-red accents for power users",
+    "type": "dark",
+    "author": "Percepta Team",
+    "version": "1.0.0",
+    "colors": {
+        "primary": "#DC143C",
+        "secondary": "#B22222",
+        "accent": "#FF6B6B",
+        "warning": "#FF8C42",
+        "error": "#8B0000",
+        "bg_main": "#0D0D0D",
+        "bg_card": "#1A0F0F",
+        "bg_interactive": "#2A1515",
+        "bg_hover": "#3A1A1A",
+        "text_primary": "#FFFFFF",
+        "text_secondary": "#FFB3B3",
+        "text_muted": "#CC8080",
+        "text_inverse": "#0D0D0D",
+        "border_color": "#4D2020",
+        "border_hover": "#6D3030",
+        "border_focus": "#DC143C"
+    },
+    "spacing": {
+        "xs": "4px",
+        "sm": "8px",
+        "md": "12px",
+        "lg": "16px",
+        "xl": "20px",
+        "xxl": "24px",
+        "xxxl": "32px"
+    },
+    "radius": {
+        "sm": "4px",
+        "md": "8px",
+        "lg": "12px",
+        "xl": "16px"
+    },
+    "shadows": {
+        "card": "0 4px 20px rgba(220, 20, 60, 0.3)",
+        "hover": "0 6px 25px rgba(220, 20, 60, 0.5)",
+        "button": "0 2px 10px rgba(220, 20, 60, 0.4)",
+        "focus": "0 0 0 3px rgba(220, 20, 60, 0.2)"
+    },
+    "gradients": {
+        "primary": "linear-gradient(135deg, #DC143C 0%, #B22222 100%)",
+        "secondary": "linear-gradient(135deg, #B22222 0%, #8B0000 100%)",
+        "accent": "linear-gradient(135deg, #FF6B6B 0%, #DC143C 100%)"
+    }
+} 

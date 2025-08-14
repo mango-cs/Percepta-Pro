@@ -1,0 +1,356 @@
+{
+  "designSystem": {
+    "name": "Crimzon Dashboard",
+    "theme": "dark",
+    "primaryColors": {
+      "crimzonRed": "#FF4757",
+      "crimzonOrange": "#FF6348",
+      "crimzonAmber": "#FFA502",
+      "accentGreen": "#2ED573",
+      "backgroundDark": "#1A1A1A",
+      "surfaceDark": "#2D2D2D",
+      "surfaceLight": "#3A3A3A"
+    },
+    "elementStyling": {
+      "layout": {
+        "sidebar": {
+          "background": "#2D2D2D",
+          "width": "280px",
+          "borderRight": "1px solid #404040"
+        },
+        "mainContent": {
+          "background": "#1A1A1A",
+          "padding": "24px"
+        }
+      },
+      "navigation": {
+        "menuItems": {
+          "default": {
+            "background": "transparent",
+            "text": "#A0A0A0",
+            "icon": "#A0A0A0",
+            "padding": "12px 20px",
+            "borderRadius": "8px",
+            "margin": "4px 16px"
+          },
+          "active": {
+            "background": "linear-gradient(135deg, #FF4757 0%, #FF6348 100%)",
+            "text": "#FFFFFF",
+            "icon": "#FFFFFF",
+            "shadow": "0 2px 8px rgba(255, 71, 87, 0.3)"
+          },
+          "hover": {
+            "background": "#3A3A3A",
+            "text": "#FFFFFF",
+            "icon": "#FFFFFF"
+          }
+        },
+        "projectIndicator": {
+          "background": "#FF4757",
+          "text": "#FFFFFF",
+          "borderRadius": "50%",
+          "size": "20px",
+          "position": "right"
+        }
+      },
+      "cards": {
+        "primaryMetric": {
+          "background": "#2D2D2D",
+          "border": "1px solid #404040",
+          "borderRadius": "12px",
+          "padding": "24px",
+          "shadow": "0 4px 16px rgba(0, 0, 0, 0.2)",
+          "title": {
+            "text": "#A0A0A0",
+            "fontSize": "14px",
+            "fontWeight": "500"
+          },
+          "value": {
+            "text": "#FFFFFF",
+            "fontSize": "32px",
+            "fontWeight": "700"
+          },
+          "growthIndicator": {
+            "background": "linear-gradient(135deg, #FF4757 0%, #FF6348 100%)",
+            "text": "#FFFFFF",
+            "borderRadius": "6px",
+            "padding": "4px 8px",
+            "fontSize": "12px",
+            "fontWeight": "600"
+          }
+        },
+        "chartCard": {
+          "background": "#2D2D2D",
+          "border": "1px solid #404040",
+          "borderRadius": "12px",
+          "padding": "20px",
+          "shadow": "0 4px 16px rgba(0, 0, 0, 0.2)",
+          "chart": {
+            "lineColor": "#FF6348",
+            "gradientFill": "linear-gradient(180deg, rgba(255, 99, 72, 0.2) 0%, rgba(255, 99, 72, 0.05) 100%)",
+            "backgroundColor": "transparent"
+          }
+        },
+        "progressCard": {
+          "background": "#2D2D2D",
+          "border": "1px solid #404040",
+          "borderRadius": "12px",
+          "padding": "20px",
+          "shadow": "0 4px 16px rgba(0, 0, 0, 0.2)"
+        }
+      },
+      "charts": {
+        "lineChart": {
+          "strokeColor": "#FF6348",
+          "strokeWidth": "2px",
+          "fill": "linear-gradient(180deg, rgba(255, 99, 72, 0.2) 0%, rgba(255, 99, 72, 0.05) 100%)",
+          "gridLines": "#404040",
+          "backgroundColor": "transparent"
+        },
+        "barChart": {
+          "barColor": "linear-gradient(180deg, #FF4757 0%, #FF6348 100%)",
+          "backgroundColor": "transparent",
+          "spacing": "8px"
+        },
+        "progressRing": {
+          "trackColor": "#404040",
+          "fillColor": "linear-gradient(135deg, #FF4757 0%, #FF6348 100%)",
+          "strokeWidth": "8px",
+          "backgroundColor": "#1A1A1A"
+        }
+      },
+      "buttons": {
+        "primary": {
+          "background": "linear-gradient(135deg, #FF4757 0%, #FF6348 100%)",
+          "text": "#FFFFFF",
+          "border": "none",
+          "borderRadius": "8px",
+          "padding": "10px 16px",
+          "fontSize": "14px",
+          "fontWeight": "600",
+          "shadow": "0 2px 8px rgba(255, 71, 87, 0.3)",
+          "hover": {
+            "background": "linear-gradient(135deg, #E63946 0%, #F77F00 100%)",
+            "shadow": "0 4px 12px rgba(255, 71, 87, 0.4)"
+          }
+        },
+        "secondary": {
+          "background": "#3A3A3A",
+          "text": "#FFFFFF",
+          "border": "1px solid #404040",
+          "borderRadius": "8px",
+          "padding": "10px 16px",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "hover": {
+            "background": "#4A4A4A",
+            "border": "1px solid #505050"
+          }
+        },
+        "icon": {
+          "background": "transparent",
+          "icon": "#A0A0A0",
+          "borderRadius": "6px",
+          "padding": "8px",
+          "hover": {
+            "background": "#3A3A3A",
+            "icon": "#FFFFFF"
+          }
+        }
+      },
+      "icons": {
+        "navigation": {
+          "fill": "#A0A0A0",
+          "size": "20px",
+          "active": {
+            "fill": "#FFFFFF"
+          }
+        },
+        "action": {
+          "fill": "#A0A0A0",
+          "size": "16px",
+          "hover": {
+            "fill": "#FFFFFF"
+          }
+        },
+        "status": {
+          "success": "#2ED573",
+          "warning": "#FFA502",
+          "error": "#FF4757",
+          "size": "14px"
+        }
+      },
+      "typography": {
+        "heading1": {
+          "color": "#FFFFFF",
+          "fontSize": "32px",
+          "fontWeight": "700",
+          "lineHeight": "1.2"
+        },
+        "heading2": {
+          "color": "#FFFFFF",
+          "fontSize": "24px",
+          "fontWeight": "600",
+          "lineHeight": "1.3"
+        },
+        "heading3": {
+          "color": "#FFFFFF",
+          "fontSize": "18px",
+          "fontWeight": "600",
+          "lineHeight": "1.4"
+        },
+        "body": {
+          "color": "#E0E0E0",
+          "fontSize": "14px",
+          "fontWeight": "400",
+          "lineHeight": "1.5"
+        },
+        "caption": {
+          "color": "#A0A0A0",
+          "fontSize": "12px",
+          "fontWeight": "500",
+          "lineHeight": "1.4"
+        },
+        "metric": {
+          "color": "#FFFFFF",
+          "fontSize": "32px",
+          "fontWeight": "700",
+          "lineHeight": "1.1"
+        }
+      },
+      "badges": {
+        "growth": {
+          "background": "linear-gradient(135deg, #FF4757 0%, #FF6348 100%)",
+          "text": "#FFFFFF",
+          "borderRadius": "6px",
+          "padding": "4px 8px",
+          "fontSize": "12px",
+          "fontWeight": "600"
+        },
+        "team": {
+          "background": "#3A3A3A",
+          "text": "#FFFFFF",
+          "borderRadius": "16px",
+          "padding": "4px 12px",
+          "fontSize": "12px",
+          "fontWeight": "500",
+          "border": "1px solid #404040"
+        }
+      },
+      "progressBars": {
+        "circular": {
+          "trackColor": "#404040",
+          "fillColor": "linear-gradient(135deg, #FF4757 0%, #FF6348 100%)",
+          "strokeWidth": "8px",
+          "size": "80px",
+          "text": {
+            "percentage": "#FFFFFF",
+            "label": "#A0A0A0"
+          }
+        },
+        "linear": {
+          "trackColor": "#404040",
+          "fillColor": "linear-gradient(90deg, #FF4757 0%, #FF6348 100%)",
+          "height": "8px",
+          "borderRadius": "4px"
+        }
+      },
+      "quickActions": {
+        "container": {
+          "background": "#2D2D2D",
+          "border": "1px solid #404040",
+          "borderRadius": "12px",
+          "padding": "20px"
+        },
+        "actionItem": {
+          "background": "#3A3A3A",
+          "border": "1px solid #404040",
+          "borderRadius": "8px",
+          "padding": "16px",
+          "text": "#E0E0E0",
+          "icon": "#A0A0A0",
+          "hover": {
+            "background": "#4A4A4A",
+            "border": "1px solid #505050",
+            "text": "#FFFFFF",
+            "icon": "#FFFFFF"
+          }
+        }
+      }
+    },
+    "spacing": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "12px",
+      "lg": "16px",
+      "xl": "20px",
+      "xxl": "24px",
+      "xxxl": "32px"
+    },
+    "borderRadius": {
+      "sm": "6px",
+      "md": "8px",
+      "lg": "12px",
+      "xl": "16px",
+      "circle": "50%"
+    },
+    "shadows": {
+      "card": "0 4px 16px rgba(0, 0, 0, 0.2)",
+      "button": "0 2px 8px rgba(255, 71, 87, 0.3)",
+      "hover": "0 4px 12px rgba(255, 71, 87, 0.4)"
+    },
+    "animations": {
+      "hover": {
+        "duration": "200ms",
+        "easing": "ease-in-out"
+      },
+      "focus": {
+        "duration": "150ms",
+        "easing": "ease-out"
+      }
+    },
+    "doNotRules": {
+      "gradients": [
+        "DO NOT apply card gradients to icons or text elements",
+        "DO NOT use button gradients on card backgrounds",
+        "DO NOT apply navigation gradients to content areas"
+      ],
+      "colors": [
+        "DO NOT use card background colors for text",
+        "DO NOT apply text colors to icon fills",
+        "DO NOT use gradient colors as solid border colors"
+      ],
+      "shadows": [
+        "DO NOT apply card shadows to icons or text",
+        "DO NOT use button shadows on navigation elements",
+        "DO NOT stack multiple shadow effects"
+      ],
+      "spacing": [
+        "DO NOT use card padding for button padding",
+        "DO NOT apply container margins to text elements"
+      ]
+    },
+    "contextRules": {
+      "cardContainers": {
+        "background": "Use #2D2D2D solid color only",
+        "gradients": "Never apply gradients to card container backgrounds",
+        "borders": "Use #404040 for card borders, never gradient borders"
+      },
+      "progressElements": {
+        "fills": "Use gradients for progress fills only, not containers",
+        "tracks": "Use solid #404040 for progress tracks",
+        "text": "Use solid colors for percentage text, never gradients"
+      },
+      "navigationElements": {
+        "activeStates": "Apply gradients only to active navigation items",
+        "icons": "Use solid colors for navigation icons",
+        "backgrounds": "Use solid colors for navigation backgrounds"
+      },
+      "actionButtons": {
+        "primary": "Apply gradients to primary button backgrounds only",
+        "secondary": "Use solid colors for secondary button backgrounds",
+        "text": "Use solid white for button text, never gradients"
+      }
+    }
+  }
+}

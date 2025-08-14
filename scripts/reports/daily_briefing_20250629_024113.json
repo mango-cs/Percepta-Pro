@@ -1,0 +1,99 @@
+{
+  "report_type": "daily_briefing",
+  "generated_at": "2025-06-29T02:41:13.174617",
+  "report_period": {
+    "start_date": "2025-06-28",
+    "end_date": "2025-06-29"
+  },
+  "executive_summary": {
+    "overall_status": "STABLE",
+    "key_highlights": [
+      "Monitoring 192 videos and 1,719 comments",
+      "Average sentiment score: 0.056",
+      "Reputation health: GOOD"
+    ],
+    "critical_issues": [],
+    "performance_indicators": {
+      "content_volume": 192,
+      "engagement_level": 1719,
+      "sentiment_score": 0.056,
+      "threat_level": 0
+    },
+    "reputation_health": "GOOD"
+  },
+  "key_metrics": {
+    "content_metrics": {
+      "total_videos": 192,
+      "unique_channels": 87,
+      "avg_video_views": 15106.364583333334,
+      "total_video_views": "2900422"
+    },
+    "engagement_metrics": {
+      "total_comments": 1719,
+      "unique_commenters": 1240,
+      "avg_likes_per_comment": 4.737361282367448,
+      "engagement_rate": 8.953125
+    },
+    "sentiment_metrics": {
+      "avg_sentiment": 0.05583415536374846,
+      "positive_percentage": 23.909249563699824,
+      "negative_percentage": 14.136125654450263,
+      "sentiment_volatility": 0.3460980330499679
+    },
+    "growth_metrics": {}
+  },
+  "threat_assessment": {},
+  "sentiment_analysis": {
+    "overall_sentiment": "NEUTRAL",
+    "sentiment_distribution": {
+      "positive": 23.9,
+      "negative": 14.1,
+      "neutral": 50.7
+    },
+    "sentiment_trends": {},
+    "key_insights": [
+      "Average sentiment: 0.056",
+      "Dominant sentiment: NEUTRAL",
+      "Sentiment volatility: 0.346"
+    ],
+    "sentiment_drivers": {
+      "positive_keywords": [
+        "and",
+        "the",
+        "is",
+        "sir",
+        "good"
+      ],
+      "negative_keywords": [
+        "is",
+        "and",
+        "he",
+        "the",
+        "top-level:"
+      ]
+    }
+  },
+  "recommendations": [
+    {
+      "priority": "MEDIUM",
+      "category": "Content Strategy",
+      "title": "Accelerate Content Production",
+      "description": "Content growth rate below optimal levels",
+      "actions": [
+        "Increase content publishing frequency",
+        "Diversify content formats",
+        "Focus on trending topics",
+        "Optimize content for search visibility"
+      ]
+    }
+  ],
+  "action_items": [
+    {
+      "priority": "ONGOING",
+      "owner": "Monitoring Team",
+      "action": "Continue real-time reputation monitoring",
+      "deadline": "Continuous",
+      "status": "ACTIVE"
+    }
+  ]
+}

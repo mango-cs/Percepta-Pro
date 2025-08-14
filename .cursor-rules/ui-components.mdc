@@ -1,0 +1,604 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Percepta Pro - UI Components Development Rules
+
+```yaml
+alwaysApply: true
+description: "UI component development standards for Percepta Pro dashboard interface"
+filePatterns:
+  - "app/components/**/*.py"
+  - "app/pages/**/*.py"
+  - "src/dashboard/components/**/*.py"
+  - "src/dashboard/pages/**/*.py"
+```
+
+## UI Component Standards
+
+### Component Architecture
+- Create reusable, modular components
+- Implement clear component interfaces with type hints
+- Follow single responsibility principle
+- Support customization through props/parameters
+
+```python
+from typing import Dict, List, Optional, Union, Callable
+from dataclasses import dataclass
+from enum import Enum
+
+class ComponentSize(Enum):
+    SMALL = "sm"
+    MEDIUM = "md" 
+    LARGE = "lg"
+    EXTRA_LARGE = "xl"
+
+class ComponentVariant(Enum):
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+    SUCCESS = "success"
+    WARNING = "warning"
+    ERROR = "error"
+
+@dataclass
+class ComponentProps:
+    """Base properties for all UI components."""
+    id: Optional[str] = None
+    className: Optional[str] = None
+    style: Optional[Dict[str, str]] = None
+    disabled: bool = False
+    loading: bool = False
+    visible: bool = True
+
+def create_base_component(props: ComponentProps, content: str) -> str:
+    """Create base component wrapper with common properties."""
+    
+    # Build CSS classes
+    css_classes = ["percepta-component"]
+    if props.className:
+        css_classes.append(props.className)
+    if props.disabled:
+        css_classes.append("disabled")
+    if props.loading:
+        css_classes.append("loading")
+    
+    # Build inline styles
+    inline_styles = []
+    if props.style:
+        for key, value in props.style.items():
+            inline_styles.append(f"{key}: {value}")
+    if not props.visible:
+        inline_styles.append("display: none")
+    
+    style_attr = f'style="{"; ".join(inline_styles)}"' if inline_styles else ""
+    class_attr = f'class="{" ".join(css_classes)}"'
+    id_attr = f'id="{props.id}"' if props.id else ""
+    
+    return f'<div {id_attr} {class_attr} {style_attr}>{content}</div>'
+```
+
+### Dashboard Layout Components
+- Implement consistent page layouts
+- Create responsive grid systems
+- Support different viewport sizes
+- Maintain consistent spacing and alignment
+
+```python
+def create_dashboard_page(title: str, subtitle: str = "", 
+                         content_blocks: List[Dict[str, Any]] = None,
+                         sidebar_enabled: bool = True) -> None:
+    """Create standardized dashboard page layout."""
+    
+    # Page header
+    create_page_header(title, subtitle, show_mode_indicator=True)
+    
+    # Main content area
+    if content_blocks:
+        for block in content_blocks:
+            block_type = block.get('type', 'content')
+            
+            if block_type == 'metrics_grid':
+                create_metrics_grid(block.get('metrics', []))
+            elif block_type == 'chart_section':
+                create_chart_section(block.get('charts', []))
+            elif block_type == 'data_table':
+                create_data_table_section(block.get('data'), block.get('config', {}))
+            elif block_type == 'custom':
+                # Render custom content
+                if 'render_function' in block:
+                    block['render_function'](block.get('props', {}))
+            
+            # Add spacing between blocks
+            add_spacing('lg')
+
+def create_metrics_grid(metrics: List[Dict[str, Any]], 
+                       columns: Optional[int] = None) -> None:
+    """Create responsive metrics grid layout."""
+    
+    if not metrics:
+        return
+    
+    # Determine optimal column count
+    num_metrics = len(metrics)
+    if columns is None:
+        if num_metrics <= 2:
+            columns = num_metrics
+        elif num_metrics <= 4:
+            columns = 2
+        elif num_metrics <= 6:
+            columns = 3
+        else:
+            columns = 4
+    
+    # Create responsive columns
+    cols = st.columns(columns)
+    
+    for i, metric in enumerate(metrics):
+        col_index = i % columns
+        with cols[col_index]:
+            create_metric_card(
+                title=metric.get('title', ''),
+                value=metric.get('value', ''),
+                icon=metric.get('icon', '📊'),
+                status=metric.get('status', 'neutral'),
+                trend_value=metric.get('trend'),
+                show_trend=metric.get('show_trend', False)
+            )
+
+def create_chart_section(charts: List[Dict[str, Any]]) -> None:
+    """Create section with multiple charts in responsive layout."""
+    
+    if len(charts) == 1:
+        # Single chart - full width
+        chart = charts[0]
+        st.markdown(f'<h3 class="chart-title">{chart.get("title", "")}</h3>', 
+                   unsafe_allow_html=True)
+        st.plotly_chart(chart['figure'], use_container_width=True)
+        
+    elif len(charts) == 2:
+        # Two charts - side by side
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            chart = charts[0]
+            st.markdown(f'<h3 class="chart-title">{chart.get("title", "")}</h3>', 
+                       unsafe_allow_html=True)
+            st.plotly_chart(chart['figure'], use_container_width=True)
+            
+        with col2:
+            chart = charts[1]
+            st.markdown(f'<h3 class="chart-title">{chart.get("title", "")}</h3>', 
+                       unsafe_allow_html=True)
+            st.plotly_chart(chart['figure'], use_container_width=True)
+    
+    else:
+        # Multiple charts - stacked with spacing
+        for chart in charts:
+            st.markdown(f'<h3 class="chart-title">{chart.get("title", "")}</h3>', 
+                       unsafe_allow_html=True)
+            st.plotly_chart(chart['figure'], use_container_width=True)
+            add_spacing('md')
+```
+
+### Interactive Components
+- Implement consistent form controls
+- Add proper validation and error handling
+- Provide clear user feedback
+- Support keyboard and mouse interactions
+
+```python
+def create_filter_panel(filters: List[Dict[str, Any]], 
+                       on_change: Callable = None) -> Dict[str, Any]:
+    """Create interactive filter panel with multiple controls."""
+    
+    filter_values = {}
+    
+    st.markdown('<div class="filter-panel">', unsafe_allow_html=True)
+    
+    # Create columns for filters
+    num_filters = len(filters)
+    if num_filters <= 3:
+        cols = st.columns(num_filters)
+    else:
+        cols = st.columns(3)
+    
+    for i, filter_config in enumerate(filters):
+        col_index = i % len(cols)
+        
+        with cols[col_index]:
+            filter_type = filter_config.get('type', 'selectbox')
+            filter_key = filter_config['key']
+            filter_label = filter_config.get('label', filter_key.title())
+            
+            if filter_type == 'selectbox':
+                value = st.selectbox(
+                    filter_label,
+                    options=filter_config['options'],
+                    index=filter_config.get('default_index', 0),
+                    key=f"filter_{filter_key}"
+                )
+                
+            elif filter_type == 'multiselect':
+                value = st.multiselect(
+                    filter_label,
+                    options=filter_config['options'],
+                    default=filter_config.get('default', []),
+                    key=f"filter_{filter_key}"
+                )
+                
+            elif filter_type == 'date_range':
+                col_start, col_end = st.columns(2)
+                with col_start:
+                    start_date = st.date_input(
+                        f"{filter_label} Start",
+                        value=filter_config.get('default_start'),
+                        key=f"filter_{filter_key}_start"
+                    )
+                with col_end:
+                    end_date = st.date_input(
+                        f"{filter_label} End", 
+                        value=filter_config.get('default_end'),
+                        key=f"filter_{filter_key}_end"
+                    )
+                value = (start_date, end_date)
+                
+            elif filter_type == 'slider':
+                value = st.slider(
+                    filter_label,
+                    min_value=filter_config.get('min_value', 0),
+                    max_value=filter_config.get('max_value', 100),
+                    value=filter_config.get('default_value', 50),
+                    step=filter_config.get('step', 1),
+                    key=f"filter_{filter_key}"
+                )
+            
+            filter_values[filter_key] = value
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Trigger callback on change
+    if on_change:
+        on_change(filter_values)
+    
+    return filter_values
+
+def create_data_export_component(data: pd.DataFrame, 
+                                filename_prefix: str = "export") -> None:
+    """Create data export component with multiple format options."""
+    
+    st.markdown('<div class="export-panel">', unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.markdown("**Export Data**")
+        export_formats = st.multiselect(
+            "Select formats",
+            options=["CSV", "Excel", "JSON"],
+            default=["CSV"],
+            key="export_formats"
+        )
+    
+    with col2:
+        include_index = st.checkbox(
+            "Include Index",
+            value=False,
+            key="export_include_index"
+        )
+    
+    with col3:
+        if st.button("Download", key="export_download"):
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            for format_type in export_formats:
+                if format_type == "CSV":
+                    csv_data = data.to_csv(index=include_index)
+                    st.download_button(
+                        f"📄 Download CSV",
+                        data=csv_data,
+                        file_name=f"{filename_prefix}_{timestamp}.csv",
+                        mime="text/csv"
+                    )
+                    
+                elif format_type == "Excel":
+                    buffer = io.BytesIO()
+                    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                        data.to_excel(writer, index=include_index, sheet_name='Data')
+                    
+                    st.download_button(
+                        f"📊 Download Excel",
+                        data=buffer.getvalue(),
+                        file_name=f"{filename_prefix}_{timestamp}.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+                    
+                elif format_type == "JSON":
+                    json_data = data.to_json(orient='records', indent=2)
+                    st.download_button(
+                        f"📋 Download JSON",
+                        data=json_data,
+                        file_name=f"{filename_prefix}_{timestamp}.json",
+                        mime="application/json"
+                    )
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+```
+
+### Status & Feedback Components
+- Create consistent status indicators
+- Implement progress tracking
+- Provide clear error messages
+- Show loading states appropriately
+
+```python
+def create_status_indicator(status: str, message: str = "", 
+                          show_icon: bool = True) -> None:
+    """Create status indicator with consistent styling."""
+    
+    status_config = {
+        'success': {'color': '#2ED573', 'icon': '✅', 'bg': 'rgba(46, 213, 115, 0.1)'},
+        'warning': {'color': '#FFA502', 'icon': '⚠️', 'bg': 'rgba(255, 165, 2, 0.1)'},
+        'error': {'color': '#FF4757', 'icon': '❌', 'bg': 'rgba(255, 71, 87, 0.1)'},
+        'info': {'color': '#3742FA', 'icon': 'ℹ️', 'bg': 'rgba(55, 66, 250, 0.1)'},
+        'loading': {'color': '#CCCCCC', 'icon': '⏳', 'bg': 'rgba(204, 204, 204, 0.1)'}
+    }
+    
+    config = status_config.get(status, status_config['info'])
+    icon_html = f'<span style="margin-right: 0.5rem;">{config["icon"]}</span>' if show_icon else ''
+    
+    status_html = f"""
+    <div style="
+        background: {config['bg']};
+        border: 1px solid {config['color']};
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        color: {config['color']};
+        font-weight: 500;
+    ">
+        {icon_html}
+        {message}
+    </div>
+    """
+    
+    st.markdown(status_html, unsafe_allow_html=True)
+
+def create_progress_tracker(steps: List[Dict[str, Any]], 
+                          current_step: int = 0) -> None:
+    """Create progress tracker component."""
+    
+    progress_html = '<div class="progress-tracker">'
+    
+    for i, step in enumerate(steps):
+        is_current = i == current_step
+        is_completed = i < current_step
+        is_upcoming = i > current_step
+        
+        # Determine step styling
+        if is_completed:
+            step_class = "completed"
+            step_color = "#2ED573"
+            step_icon = "✓"
+        elif is_current:
+            step_class = "current"
+            step_color = "#FF4757"
+            step_icon = str(i + 1)
+        else:
+            step_class = "upcoming"
+            step_color = "#666666"
+            step_icon = str(i + 1)
+        
+        step_html = f"""
+        <div class="progress-step {step_class}" style="
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        ">
+            <div style="
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: {step_color};
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                margin-right: 1rem;
+            ">
+                {step_icon}
+            </div>
+            <div>
+                <div style="color: {step_color}; font-weight: 600;">{step['title']}</div>
+                <div style="color: #999; font-size: 0.875rem;">{step.get('description', '')}</div>
+            </div>
+        </div>
+        """
+        
+        progress_html += step_html
+        
+        # Add connector line (except for last step)
+        if i < len(steps) - 1:
+            connector_color = "#2ED573" if is_completed else "#333"
+            progress_html += f"""
+            <div style="
+                width: 2px;
+                height: 20px;
+                background: {connector_color};
+                margin-left: 15px;
+                margin-bottom: 0.5rem;
+            "></div>
+            """
+    
+    progress_html += '</div>'
+    st.markdown(progress_html, unsafe_allow_html=True)
+
+def create_loading_spinner(message: str = "Loading...", 
+                          size: ComponentSize = ComponentSize.MEDIUM) -> None:
+    """Create loading spinner with message."""
+    
+    size_map = {
+        ComponentSize.SMALL: '20px',
+        ComponentSize.MEDIUM: '32px', 
+        ComponentSize.LARGE: '48px',
+        ComponentSize.EXTRA_LARGE: '64px'
+    }
+    
+    spinner_size = size_map[size]
+    
+    spinner_html = f"""
+    <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+    ">
+        <div style="
+            width: {spinner_size};
+            height: {spinner_size};
+            border: 3px solid #333;
+            border-top: 3px solid #FF4757;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        "></div>
+        <div style="color: #CCCCCC; font-size: 0.9rem;">{message}</div>
+    </div>
+    
+    <style>
+    @keyframes spin {{
+        0% {{ transform: rotate(0deg); }}
+        100% {{ transform: rotate(360deg); }}
+    }}
+    </style>
+    """
+    
+    st.markdown(spinner_html, unsafe_allow_html=True)
+```
+
+### Data Visualization Components
+- Create reusable chart components
+- Implement consistent styling
+- Support interactive features
+- Optimize for different data types
+
+```python
+def create_kpi_dashboard(kpis: List[Dict[str, Any]]) -> None:
+    """Create KPI dashboard with multiple visualization types."""
+    
+    for kpi_group in kpis:
+        group_title = kpi_group.get('title', '')
+        if group_title:
+            st.markdown(f'<h2 class="kpi-group-title">{group_title}</h2>', 
+                       unsafe_allow_html=True)
+        
+        kpi_items = kpi_group.get('items', [])
+        
+        # Create responsive grid for KPIs
+        cols = st.columns(min(len(kpi_items), 4))
+        
+        for i, kpi in enumerate(kpi_items):
+            col_index = i % len(cols)
+            
+            with cols[col_index]:
+                visualization_type = kpi.get('type', 'metric')
+                
+                if visualization_type == 'metric':
+                    create_metric_card(
+                        title=kpi['title'],
+                        value=kpi['value'],
+                        icon=kpi.get('icon', '📊'),
+                        status=kpi.get('status', 'neutral'),
+                        trend_value=kpi.get('trend'),
+                        show_trend=kpi.get('show_trend', False)
+                    )
+                    
+                elif visualization_type == 'gauge':
+                    create_gauge_chart(
+                        title=kpi['title'],
+                        value=kpi['value'],
+                        max_value=kpi.get('max_value', 100),
+                        color=kpi.get('color', '#FF4757')
+                    )
+                    
+                elif visualization_type == 'mini_chart':
+                    create_mini_chart(
+                        title=kpi['title'],
+                        data=kpi['data'],
+                        chart_type=kpi.get('chart_type', 'line')
+                    )
+        
+        add_spacing('lg')
+
+def create_gauge_chart(title: str, value: float, 
+                      max_value: float = 100,
+                      color: str = "#FF4757") -> None:
+    """Create gauge chart for KPI display."""
+    
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number+delta",
+        value=value,
+        domain={'x': [0, 1], 'y': [0, 1]},
+        title={'text': title},
+        delta={'reference': max_value * 0.8},  # Target reference
+        gauge={
+            'axis': {'range': [None, max_value]},
+            'bar': {'color': color},
+            'steps': [
+                {'range': [0, max_value * 0.5], 'color': 'rgba(255, 71, 87, 0.2)'},
+                {'range': [max_value * 0.5, max_value * 0.8], 'color': 'rgba(255, 165, 2, 0.2)'},
+                {'range': [max_value * 0.8, max_value], 'color': 'rgba(46, 213, 115, 0.2)'}
+            ],
+            'threshold': {
+                'line': {'color': "red", 'width': 4},
+                'thickness': 0.75,
+                'value': max_value * 0.9
+            }
+        }
+    ))
+    
+    fig.update_layout(
+        height=200,
+        margin=dict(l=20, r=20, t=40, b=20),
+        paper_bgcolor='rgba(0,0,0,0)',
+        font={'color': '#FFFFFF', 'size': 12}
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+def create_mini_chart(title: str, data: pd.DataFrame, 
+                     chart_type: str = "line") -> None:
+    """Create mini chart for trend visualization."""
+    
+    if chart_type == "line":
+        fig = px.line(data, x=data.columns[0], y=data.columns[1])
+    elif chart_type == "bar":
+        fig = px.bar(data, x=data.columns[0], y=data.columns[1])
+    else:
+        fig = px.area(data, x=data.columns[0], y=data.columns[1])
+    
+    # Minimal styling for mini chart
+    fig.update_layout(
+        height=150,
+        margin=dict(l=0, r=0, t=30, b=0),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        showlegend=False,
+        title={'text': title, 'font': {'size': 14}},
+        xaxis={'visible': False},
+        yaxis={'visible': False}
+    )
+    
+    fig.update_traces(
+        line_color='#FF4757' if chart_type == 'line' else None,
+        marker_color='#FF4757' if chart_type == 'bar' else None,
+        fill='tonexty' if chart_type == 'area' else None,
+        fillcolor='rgba(255, 71, 87, 0.3)' if chart_type == 'area' else None
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)

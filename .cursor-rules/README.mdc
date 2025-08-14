@@ -1,0 +1,290 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Percepta Pro - Cursor AI Rules Documentation
+
+```yaml
+alwaysApply: true
+description: "Complete guide to Cursor AI rules for Percepta Pro reputation dashboard development"
+filePatterns:
+  - "**/*.md"
+  - "README.md"
+  - ".cursor-rules/**/*.mdc"
+```
+
+## 🎯 Rules Overview
+
+This directory contains comprehensive Cursor AI rules specifically designed for the **Percepta Pro** reputation monitoring dashboard. These rules enforce best practices across all aspects of the codebase.
+
+### 📋 Rule Files Summary
+
+| File | Scope | Purpose |
+|------|-------|---------|
+| `general.mdc` | All Python files | Core Python standards, type hints, error handling |
+| `streamlit.mdc` | Streamlit dashboard files | Caching, UI components, performance optimization |
+| `data-processing.mdc` | Data processing scripts | Pandas operations, data cleaning, quality assurance |
+| `ml-analytics.mdc` | ML models & analytics | Model training, feature engineering, prediction systems |
+| `themes.mdc` | Theme & styling files | Crimzon design system, consistent UI styling |
+| `ui-components.mdc` | UI component files | Reusable components, layout patterns, interactivity |
+
+## 🚀 Implementation Guidelines
+
+### For New Development
+```python
+# ✅ Good: Following the rules
+@st.cache_data(ttl=300)
+def load_reputation_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Load videos and comments data with caching."""
+    try:
+        videos_df = pd.read_csv("backend/data/videos/youtube_videos_final.csv")
+        comments_df = pd.read_csv("backend/data/comments/youtube_comments_final.csv")
+        return videos_df, comments_df
+    except FileNotFoundError as e:
+        logger.error(f"Data file not found: {e}")
+        return pd.DataFrame(), pd.DataFrame()
+
+# ❌ Bad: Violating the rules  
+def load_data():
+    videos = pd.read_csv("videos.csv")  # No error handling, no type hints
+    return videos
+```
+
+### For Existing Code Refactoring
+1. **Add Type Hints**: Start with function signatures
+2. **Implement Caching**: Add `@st.cache_data` to data loading functions
+3. **Error Handling**: Wrap file operations in try-except blocks
+4. **Validation**: Add data validation before processing
+5. **Consistent Styling**: Use theme constants instead of hardcoded colors
+
+## 📊 Project-Specific Rules
+
+### Percepta Pro Architecture
+The rules are tailored to the specific architecture of Percepta Pro:
+
+```
+Percepta/
+├── reputation_dashboard.py    # Main Streamlit app
+├── src/                      # Core modules
+│   ├── analytics/           # ML & predictive models
+│   ├── data_processing/     # Data cleaning & ETL
+│   ├── themes/              # Crimzon design system
+│   └── dashboard/           # UI components
+├── app/                     # Application structure
+│   ├── components/          # Reusable UI components
+│   ├── pages/              # Dashboard pages
+│   └── utils/              # Utility functions
+├── scripts/                # Data processing scripts
+└── backend/data/           # Data files & models
+```
+
+### Key Standards Enforced
+
+#### 1. **Data Processing** (`data-processing.mdc`)
+- Validate DataFrame schemas before processing
+- Use vectorized pandas operations
+- Handle missing values explicitly
+- Export data with metadata
+
+#### 2. **Streamlit Development** (`streamlit.mdc`)
+- Cache data loading with `@st.cache_data`
+- Use session state for navigation
+- Implement responsive layouts with `st.columns()`
+- Sanitize user inputs
+
+#### 3. **ML & Analytics** (`ml-analytics.mdc`)
+- Version control models with metadata
+- Implement proper train/test splits
+- Monitor model performance over time
+- Provide prediction confidence scores
+
+#### 4. **Theme System** (`themes.mdc`)
+- Use Crimzon color constants
+- Apply consistent spacing scales
+- Support both light and dark modes
+- Ensure accessibility compliance
+
+#### 5. **UI Components** (`ui-components.mdc`)
+- Create reusable, typed components
+- Implement consistent status indicators
+- Support responsive design patterns
+- Add proper loading states
+
+## 🛠️ Implementation Examples
+
+### Theme-Compliant Component
+```python
+def create_reputation_metric(score: float, status: str) -> None:
+    """Create reputation metric card with theme compliance."""
+    status_color = get_status_color(status)  # From themes.mdc
+    
+    create_styled_metric_card(
+        title="Reputation Score",
+        value=f"{score}%",
+        status=status,
+        icon="🎯",
+        show_trend=True,
+        trend_value="+5.2% this week"
+    )
+```
+
+### Data Processing with Validation
+```python
+def process_youtube_comments(comments_df: pd.DataFrame) -> pd.DataFrame:
+    """Process YouTube comments with proper validation."""
+    # Validate schema (from data-processing.mdc)
+    if not validate_comments_schema(comments_df):
+        raise ValueError("Invalid comments DataFrame schema")
+    
+    # Clean data (vectorized operations)
+    cleaned_df = clean_comment_data(comments_df)
+    
+    # Export with metadata
+    export_processed_data(
+        cleaned_df, 
+        "backend/data/comments/processed_comments.csv",
+        include_metadata=True
+    )
+    
+    return cleaned_df
+```
+
+### Cached Streamlit Function
+```python
+@st.cache_data(ttl=300, show_spinner=True)
+def load_ml_predictions(horizon_days: int = 30) -> Dict[str, Any]:
+    """Load ML predictions with caching."""
+    try:
+        predictor = ReputationPredictor(ModelManager())
+        features = create_reputation_features(
+            load_comments_data(), 
+            load_videos_data()
+        )
+        return predictor.predict_reputation_score(features, horizon_days)
+    except Exception as e:
+        logger.error(f"Prediction loading failed: {e}")
+        return {"error": str(e)}
+```
+
+## 🎨 Design System Integration
+
+### Crimzon Color Palette
+```python
+CRIMZON_COLORS = {
+    'primary': '#FF4757',      # Crimzon Red
+    'secondary': '#FF6348',    # Crimzon Orange
+    'accent': '#2ED573',       # Success Green
+    'warning': '#FFA502',      # Crimzon Amber
+    'background_primary': '#1A1A1A',
+    'background_secondary': '#2D2D2D',
+    'text_primary': '#FFFFFF',
+    'text_secondary': '#CCCCCC'
+}
+```
+
+### Consistent Spacing
+```python
+SPACING_SCALE = {
+    'xs': '0.25rem',   # 4px
+    'sm': '0.5rem',    # 8px  
+    'md': '1rem',      # 16px
+    'lg': '1.5rem',    # 24px
+    'xl': '2rem',      # 32px
+    'xxl': '3rem'      # 48px
+}
+```
+
+## 📈 Performance Guidelines
+
+### Caching Strategy
+- **Data Loading**: `@st.cache_data(ttl=300)` for CSV files
+- **ML Models**: `@st.cache_resource` for model objects
+- **Expensive Computations**: `@st.cache_data` with appropriate TTL
+
+### Memory Management
+- Clear large DataFrames when done: `del large_df`
+- Use efficient data types: `pd.Categorical` for repeated strings
+- Process large datasets in chunks: `pd.read_csv(chunksize=10000)`
+
+### UI Performance
+- Use `st.empty()` for dynamic updates
+- Minimize `st.rerun()` calls
+- Implement responsive layouts with `st.columns()`
+
+## 🔧 Development Workflow
+
+### Before Committing
+1. **Type Check**: Ensure all functions have type hints
+2. **Error Handling**: Check for proper try-except blocks
+3. **Theme Compliance**: Verify color usage follows Crimzon palette
+4. **Performance**: Confirm caching is implemented where needed
+5. **Validation**: Test data validation functions
+
+### Code Review Checklist
+- [ ] Type hints on all function parameters and returns
+- [ ] Error handling with specific exception types
+- [ ] Consistent use of theme colors and spacing
+- [ ] Proper caching decorators on data functions
+- [ ] Data validation before processing
+- [ ] Logging for important operations
+- [ ] Documentation strings for all public functions
+
+## 🎯 Project-Specific Patterns
+
+### Page Structure
+```python
+def show_analytics_page() -> None:
+    """Standard page structure for Percepta Pro."""
+    # 1. Page header with mode indicator
+    create_page_header("Analytics", "Advanced reputation analytics")
+    
+    # 2. Filter panel (if needed)
+    filters = create_filter_panel([...])
+    
+    # 3. Metrics grid
+    create_metrics_grid([...])
+    
+    # 4. Chart sections
+    create_chart_section([...])
+    
+    # 5. Data table (if needed)
+    create_data_table_section(data, config)
+```
+
+### Data Pipeline Pattern
+```python
+def reputation_data_pipeline() -> pd.DataFrame:
+    """Standard data processing pipeline."""
+    # 1. Load raw data
+    raw_data = load_raw_data()
+    
+    # 2. Validate schema
+    if not validate_schema(raw_data):
+        raise ValueError("Schema validation failed")
+    
+    # 3. Clean data
+    cleaned_data = clean_data(raw_data)
+    
+    # 4. Feature engineering
+    features = create_features(cleaned_data)
+    
+    # 5. Quality checks
+    quality_report = validate_data_quality(features)
+    
+    # 6. Export results
+    export_processed_data(features, "output.csv")
+    
+    return features
+```
+
+## 📚 Additional Resources
+
+- **Streamlit Documentation**: [docs.streamlit.io](https://docs.streamlit.io)
+- **Pandas Best Practices**: [pandas.pydata.org](https://pandas.pydata.org/docs/user_guide/style.html)
+- **Plotly Styling**: [plotly.com/python](https://plotly.com/python/)
+- **Type Hints Guide**: [mypy.readthedocs.io](https://mypy.readthedocs.io/en/stable/)
+
+---
+
+**Note**: These rules are automatically applied when using Cursor AI. They help maintain code quality, consistency, and performance across the Percepta Pro reputation dashboard project.

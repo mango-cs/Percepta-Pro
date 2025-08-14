@@ -1,0 +1,369 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Percepta Pro - ML & Analytics Development Rules
+
+```yaml
+alwaysApply: true
+description: "Machine learning and analytics standards for Percepta Pro predictive engines"
+filePatterns:
+  - "src/analytics/**/*.py"
+  - "scripts/*engine*.py"
+  - "scripts/*predictive*.py"
+  - "scripts/*forecasting*.py"
+  - "scripts/phase3c*.py"
+  - "**/models/**/*.py"
+```
+
+## Machine Learning Best Practices
+
+### Model Development & Training
+- Use proper train/validation/test splits
+- Implement cross-validation for model selection
+- Track model performance metrics consistently
+- Version control models and training data
+
+```python
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import classification_report, confusion_matrix
+import joblib
+from datetime import datetime
+
+def train_sentiment_model(X: pd.DataFrame, y: pd.Series, 
+                         model_name: str = "sentiment_classifier") -> Dict[str, Any]:
+    """Train sentiment classification model with proper validation."""
+    
+    # Split data with stratification
+    X_train, X_temp, y_train, y_temp = train_test_split(
+        X, y, test_size=0.4, random_state=42, stratify=y
+    )
+    X_val, X_test, y_val, y_test = train_test_split(
+        X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp
+    )
+    
+    # Train model
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+    
+    # Validate model
+    val_predictions = model.predict(X_val)
+    val_score = model.score(X_val, y_val)
+    
+    # Cross-validation
+    cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='f1_macro')
+    
+    # Test set evaluation
+    test_predictions = model.predict(X_test)
+    test_score = model.score(X_test, y_test)
+    
+    # Model metadata
+    model_info = {
+        'model': model,
+        'model_name': model_name,
+        'training_timestamp': datetime.now().isoformat(),
+        'training_samples': len(X_train),
+        'validation_samples': len(X_val),
+        'test_samples': len(X_test),
+        'validation_accuracy': val_score,
+        'test_accuracy': test_score,
+        'cv_scores': cv_scores.tolist(),
+        'cv_mean': cv_scores.mean(),
+        'cv_std': cv_scores.std(),
+        'classification_report': classification_report(y_test, test_predictions, output_dict=True),
+        'feature_columns': list(X.columns)
+    }
+    
+    # Save model and metadata
+    model_path = f"scripts/models/{model_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pkl"
+    joblib.dump(model_info, model_path)
+    logger.info(f"Model saved to {model_path}")
+    
+    return model_info
+```
+
+### Feature Engineering
+- Document feature creation logic clearly
+- Implement feature validation and monitoring
+- Use consistent scaling and encoding strategies
+- Track feature importance and stability
+
+```python
+def create_reputation_features(comments_df: pd.DataFrame, 
+                              videos_df: pd.DataFrame) -> pd.DataFrame:
+    """Create engineered features for reputation forecasting.
+    
+    Features created:
+        - sentiment_ratio: Positive/Negative sentiment ratio
+        - engagement_rate: Average likes per comment
+        - comment_velocity: Comments per day
+        - sentiment_trend: 7-day moving average of sentiment
+        - author_diversity: Unique authors ratio
+    """
+    features_df = pd.DataFrame()
+    
+    # Merge comments with video data
+    merged_df = comments_df.merge(videos_df, on='VideoID', how='left')
+    
+    # Sentiment ratio features
+    sentiment_counts = merged_df.groupby('VideoID')['Sentiment'].value_counts().unstack(fill_value=0)
+    features_df['positive_count'] = sentiment_counts.get('Positive', 0)
+    features_df['negative_count'] = sentiment_counts.get('Negative', 0)
+    features_df['neutral_count'] = sentiment_counts.get('Neutral', 0)
+    features_df['total_comments'] = sentiment_counts.sum(axis=1)
+    
+    # Calculate ratios with safe division
+    features_df['sentiment_ratio'] = np.where(
+        features_df['negative_count'] > 0,
+        features_df['positive_count'] / features_df['negative_count'],
+        features_df['positive_count']  # If no negative comments, use positive count
+    )
+    
+    # Engagement features
+    engagement_stats = merged_df.groupby('VideoID')['LikeCount'].agg(['mean', 'sum', 'std']).fillna(0)
+    features_df['avg_likes_per_comment'] = engagement_stats['mean']
+    features_df['total_likes'] = engagement_stats['sum']
+    features_df['likes_std'] = engagement_stats['std']
+    
+    # Temporal features (if date column exists)
+    if 'CommentDate' in merged_df.columns:
+        merged_df['CommentDate'] = pd.to_datetime(merged_df['CommentDate'])
+        video_dates = merged_df.groupby('VideoID')['CommentDate'].agg(['min', 'max', 'count'])
+        features_df['comment_span_days'] = (video_dates['max'] - video_dates['min']).dt.days
+        features_df['comments_per_day'] = np.where(
+            features_df['comment_span_days'] > 0,
+            features_df['total_comments'] / features_df['comment_span_days'],
+            features_df['total_comments']
+        )
+    
+    # Author diversity
+    author_stats = merged_df.groupby('VideoID')['Author'].nunique()
+    features_df['unique_authors'] = author_stats
+    features_df['author_diversity_ratio'] = features_df['unique_authors'] / features_df['total_comments']
+    
+    # Validate features
+    features_df = features_df.fillna(0)  # Handle any remaining NaN values
+    features_df = features_df.replace([np.inf, -np.inf], 0)  # Handle infinity values
+    
+    logger.info(f"Created {len(features_df.columns)} features for {len(features_df)} videos")
+    return features_df
+```
+
+### Model Persistence & Versioning
+- Save models with comprehensive metadata
+- Implement model versioning strategy
+- Track model lineage and dependencies
+- Provide model rollback capabilities
+
+```python
+class ModelManager:
+    """Manage model lifecycle and versioning."""
+    
+    def __init__(self, model_directory: str = "scripts/models"):
+        self.model_directory = Path(model_directory)
+        self.model_directory.mkdir(exist_ok=True)
+        
+    def save_model(self, model: Any, model_name: str, 
+                   metadata: Dict[str, Any]) -> str:
+        """Save model with comprehensive metadata."""
+        
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        version = f"v{timestamp}"
+        
+        model_info = {
+            'model': model,
+            'metadata': {
+                **metadata,
+                'model_name': model_name,
+                'version': version,
+                'save_timestamp': datetime.now().isoformat(),
+                'python_version': sys.version,
+                'sklearn_version': sklearn.__version__,
+                'pandas_version': pd.__version__
+            }
+        }
+        
+        # Save model
+        model_path = self.model_directory / f"{model_name}_{version}.pkl"
+        joblib.dump(model_info, model_path)
+        
+        # Update latest symlink
+        latest_path = self.model_directory / f"{model_name}_latest.pkl"
+        if latest_path.exists():
+            latest_path.unlink()
+        latest_path.symlink_to(model_path.name)
+        
+        # Save human-readable metadata
+        metadata_path = self.model_directory / f"{model_name}_{version}_metadata.json"
+        with open(metadata_path, 'w') as f:
+            json.dump(model_info['metadata'], f, indent=2, default=str)
+        
+        logger.info(f"Model {model_name} v{version} saved to {model_path}")
+        return str(model_path)
+    
+    def load_model(self, model_name: str, version: str = "latest") -> Dict[str, Any]:
+        """Load model with metadata."""
+        if version == "latest":
+            model_path = self.model_directory / f"{model_name}_latest.pkl"
+        else:
+            model_path = self.model_directory / f"{model_name}_{version}.pkl"
+            
+        if not model_path.exists():
+            raise FileNotFoundError(f"Model not found: {model_path}")
+            
+        model_info = joblib.load(model_path)
+        logger.info(f"Loaded model {model_name} from {model_path}")
+        return model_info
+```
+
+### Prediction & Inference
+- Implement input validation for predictions
+- Handle edge cases and out-of-distribution data
+- Provide prediction confidence scores
+- Log prediction requests and results
+
+```python
+class ReputationPredictor:
+    """Handle reputation score predictions with validation."""
+    
+    def __init__(self, model_manager: ModelManager):
+        self.model_manager = model_manager
+        self.models = {}
+        self._load_models()
+    
+    def _load_models(self) -> None:
+        """Load all required models."""
+        model_names = ['reputation_forecasting', 'sentiment_analysis', 'threat_prediction']
+        
+        for model_name in model_names:
+            try:
+                model_info = self.model_manager.load_model(model_name)
+                self.models[model_name] = model_info
+                logger.info(f"Loaded model: {model_name}")
+            except FileNotFoundError:
+                logger.warning(f"Model not found: {model_name}")
+    
+    def predict_reputation_score(self, features: pd.DataFrame, 
+                                horizon_days: int = 30) -> Dict[str, Any]:
+        """Predict reputation score with confidence intervals."""
+        
+        # Validate inputs
+        if not self._validate_features(features):
+            raise ValueError("Invalid feature data provided")
+        
+        if horizon_days not in [7, 30, 90]:
+            raise ValueError("Horizon must be 7, 30, or 90 days")
+        
+        model_info = self.models.get('reputation_forecasting')
+        if not model_info:
+            raise RuntimeError("Reputation forecasting model not available")
+        
+        model = model_info['model']
+        
+        # Make predictions
+        predictions = model.predict(features)
+        
+        # Calculate prediction confidence (if model supports it)
+        confidence_scores = None
+        if hasattr(model, 'predict_proba'):
+            probabilities = model.predict_proba(features)
+            confidence_scores = np.max(probabilities, axis=1)
+        
+        # Prepare results
+        results = {
+            'predictions': predictions.tolist(),
+            'confidence_scores': confidence_scores.tolist() if confidence_scores is not None else None,
+            'horizon_days': horizon_days,
+            'prediction_timestamp': datetime.now().isoformat(),
+            'model_version': model_info['metadata']['version'],
+            'feature_count': len(features.columns),
+            'sample_count': len(features)
+        }
+        
+        # Log prediction request
+        logger.info(f"Generated {len(predictions)} predictions for {horizon_days}-day horizon")
+        
+        return results
+    
+    def _validate_features(self, features: pd.DataFrame) -> bool:
+        """Validate feature data for prediction."""
+        if features.empty:
+            logger.error("Empty feature DataFrame provided")
+            return False
+        
+        # Check for required columns
+        model_info = self.models.get('reputation_forecasting')
+        if model_info and 'feature_columns' in model_info['metadata']:
+            required_columns = model_info['metadata']['feature_columns']
+            missing_columns = set(required_columns) - set(features.columns)
+            if missing_columns:
+                logger.error(f"Missing feature columns: {missing_columns}")
+                return False
+        
+        # Check for invalid values
+        if features.isnull().any().any():
+            logger.warning("NaN values found in features")
+            return False
+        
+        if np.isinf(features.select_dtypes(include=[np.number])).any().any():
+            logger.warning("Infinite values found in features")
+            return False
+        
+        return True
+```
+
+### Model Monitoring & Evaluation
+- Track model performance over time
+- Monitor for data drift and model degradation
+- Implement automated retraining triggers
+- Generate model performance reports
+
+```python
+def monitor_model_performance(model_name: str, 
+                            predictions: np.ndarray,
+                            actual_values: np.ndarray,
+                            threshold_accuracy: float = 0.8) -> Dict[str, Any]:
+    """Monitor model performance and detect degradation."""
+    
+    # Calculate current performance metrics
+    accuracy = accuracy_score(actual_values, predictions)
+    precision = precision_score(actual_values, predictions, average='weighted')
+    recall = recall_score(actual_values, predictions, average='weighted')
+    f1 = f1_score(actual_values, predictions, average='weighted')
+    
+    performance_metrics = {
+        'timestamp': datetime.now().isoformat(),
+        'model_name': model_name,
+        'sample_count': len(predictions),
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1_score': f1
+    }
+    
+    # Performance alerts
+    alerts = []
+    if accuracy < threshold_accuracy:
+        alerts.append({
+            'type': 'PERFORMANCE_DEGRADATION',
+            'message': f"Accuracy ({accuracy:.3f}) below threshold ({threshold_accuracy})",
+            'severity': 'HIGH'
+        })
+    
+    # Log performance
+    performance_log_path = f"logs/{model_name}_performance.jsonl"
+    with open(performance_log_path, 'a') as f:
+        json.dump(performance_metrics, f)
+        f.write('\n')
+    
+    # Trigger retraining if needed
+    if alerts:
+        logger.warning(f"Model performance alerts for {model_name}: {alerts}")
+        
+    return {
+        'metrics': performance_metrics,
+        'alerts': alerts,
+        'retraining_recommended': len(alerts) > 0
+    }
+```

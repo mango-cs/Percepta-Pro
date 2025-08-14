@@ -1,0 +1,51 @@
+{
+    "name": "Tron",
+    "description": "Digital grid theme with electric blue lines and black void backgrounds",
+    "type": "dark",
+    "author": "Percepta Team",
+    "version": "1.0.0",
+    "colors": {
+        "primary": "#00D4FF",
+        "secondary": "#0099CC",
+        "accent": "#FFFFFF",
+        "warning": "#FFB347",
+        "error": "#FF4444",
+        "bg_main": "#000000",
+        "bg_card": "#0A0A0A",
+        "bg_interactive": "#001122",
+        "bg_hover": "#002244",
+        "text_primary": "#FFFFFF",
+        "text_secondary": "#7DD3FC",
+        "text_muted": "#4F9ADB",
+        "text_inverse": "#000000",
+        "border_color": "#00D4FF",
+        "border_hover": "#0099CC",
+        "border_focus": "#FFFFFF"
+    },
+    "spacing": {
+        "xs": "4px",
+        "sm": "8px",
+        "md": "12px",
+        "lg": "16px",
+        "xl": "20px",
+        "xxl": "24px",
+        "xxxl": "32px"
+    },
+    "radius": {
+        "sm": "0px",
+        "md": "2px",
+        "lg": "4px",
+        "xl": "6px"
+    },
+    "shadows": {
+        "card": "0 0 10px rgba(0, 212, 255, 0.5), inset 0 0 1px rgba(0, 212, 255, 0.3)",
+        "hover": "0 0 20px rgba(0, 212, 255, 0.8), inset 0 0 2px rgba(0, 212, 255, 0.5)",
+        "button": "0 0 8px rgba(0, 212, 255, 0.6)",
+        "focus": "0 0 0 1px rgba(255, 255, 255, 0.9)"
+    },
+    "gradients": {
+        "primary": "linear-gradient(90deg, #000000 0%, #00D4FF 50%, #000000 100%)",
+        "secondary": "linear-gradient(135deg, #001122 0%, #002244 100%)",
+        "accent": "linear-gradient(45deg, #00D4FF 0%, #FFFFFF 100%)"
+    }
+} 
